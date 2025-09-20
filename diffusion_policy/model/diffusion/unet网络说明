@@ -1,0 +1,58 @@
+"conditional_unet1d"与"conditional_unet1d_0724"的关键差异分析
+1. ​​全局条件处理机制不同​​（核心差异）
+
+​​"conditional_unet1d"扩散时间步与全局条件​​拼接融合​​：aug_timestep_embed = torch.cat([timestep_embed, global_feature])
+
+
+使用独立条件编码器投影全局条件：self.global_cond_proj+ self.cond_encoder
+
+
+​​"conditional_unet1d_0724":
+扩散时间步与全局条件​​直接相加​​：timestep_embed + global_feature
+
+
+无专用全局条件投影层，直接拼接后输入
+
+2. ​​局部条件注入机制不同​​
+
+​​"conditional_unet1d":
+​​两次注入​​：
+
+1.
+下采样首层注入：if idx == 0 and h_local: x = x + h_local[0]
+
+2.
+上采样末层注入：if idx == len(self.up_modules) and h_local: x = x + h_local[1]
+
+
+​​"conditional_unet1d_0724":
+​​注入机制存在逻辑错误:
+上采样条件if idx == len(self.up_modules)永远为假
+
+
+实际仅下采样首层注入h_local[0]，而h_local[1]未被利用
+
+3. ​​维度处理差异​​
+特性
+
+"conditional_unet1d"
+
+"conditional_unet1d_0724"
+
+​​条件维度(cond_dim)​​
+
+固定为diffusion_step_embed_dim
+
+动态计算dsed + global_cond_dim
+
+​​残差连接维度​​
+
+严格匹配输入输出通道
+
+未显式处理维度差异
+
+​​初始输入处理​​
+
+有start_dim = down_dims[0]
+
+无专门初始层处理

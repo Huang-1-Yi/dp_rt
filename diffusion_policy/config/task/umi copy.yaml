@@ -1,0 +1,117 @@
+name: umi
+# ​​绝对位姿（abs）​​：直接使用世界坐标系中的位姿。
+# ​​相对位姿（rel）​​：在观察值中，默认配置为relative，表示观察值中的位姿是相对于当前时刻（即最新时刻）的位姿。在动作中，相对位姿表示动作的目标位姿是相对于当前时刻位姿的位姿。
+# 局部参考系​​：基于某个参考点（如其他机器人或任务起点）的坐标系
+# ​​相对其他机器人​​：如 robot0_eef_pos_wrt_robot1表示机器人0相对于机器人1的位置
+# ​​相对任务起点​​：如 eef_pos_wrt_start表示机器人相对于任务开始时的位置
+# ​​增量位姿（delta）​​：仅用于动作，表示相对于当前位姿的增量（变化量），通常用于连续控制。
+camera_obs_latency: 0.125
+robot_obs_latency: 0.0001
+gripper_obs_latency: 0.02
+dataset_frequeny: 0 #59.94
+obs_down_sample_steps: 3 # 3, 1
+action_down_sample_steps: 3
+low_dim_obs_horizon: 2
+img_obs_horizon: 2
+action_horizon: 16
+ignore_proprioception: False
+
+shape_meta: &shape_meta
+  # acceptable types: rgb, low_dim
+  obs:
+    camera0_rgb:                                          # RGB图像观测
+      shape: [3, 224, 224]                                # 图像尺寸 (通道数, 高, 宽)，3通道RGB图像
+      horizon: ${task.img_obs_horizon}                    # int 连续图像帧数（时间序列长度）
+      latency_steps: 0                                    # float 图像处理延迟步数（0表示实时）
+      down_sample_steps: ${task.obs_down_sample_steps}    # int 帧采样间隔（跳帧频率）
+      type: rgb                                           # 数据类型为RGB图像
+      ignore_by_policy: False                             # 策略训练时需使用该数据
+    robot0_eef_pos:
+      shape: [3]                                          # 机器人末端执行器位置（3D坐标）
+      horizon: ${task.low_dim_obs_horizon}                # int 动态计算的位置延迟步数
+      latency_steps: ${eval:'(${task.camera_obs_latency} - ${task.robot_obs_latency}) * ${task.dataset_frequeny}'} # float
+      down_sample_steps: ${task.obs_down_sample_steps}    # float 
+      type: low_dim
+      ignore_by_policy: ${task.ignore_proprioception}     # 是否忽略本体感知数据
+
+    robot0_eef_rot_axis_angle:                            # 机器人末端执行器的旋转（轴角表示） 机械臂旋转姿态
+      raw_shape: [3]                                      # 原始旋转向量（轴角表示）
+      shape: [6]                                          # 转换后的6D旋转表示（更稳定的神经网络输入）
+      # 避免万向节死锁问题
+      # 提供连续旋转表示（更适合神经网络学习）
+      # 在反向传播中数值更稳定
+      horizon: ${task.low_dim_obs_horizon}                # int
+      latency_steps: ${eval:'(${task.camera_obs_latency} - ${task.robot_obs_latency}) * ${task.dataset_frequeny}'} # float
+      down_sample_steps: ${task.obs_down_sample_steps}    # float
+      type: low_dim
+      rotation_rep: rotation_6d                           # 旋转表示方式 明确使用6D旋转表示法
+      ignore_by_policy: ${task.ignore_proprioception}
+    robot0_gripper_width:                                 # 夹爪宽度
+      shape: [1]                                          # 夹爪宽度的形状（1D） 单一数值表示开合程度
+      horizon: ${task.low_dim_obs_horizon}                # int
+      latency_steps: ${eval:'(${task.camera_obs_latency} - ${task.gripper_obs_latency}) * ${task.dataset_frequeny}'} # float
+      down_sample_steps: ${task.obs_down_sample_steps}    # float
+      type: low_dim
+      ignore_by_policy: ${task.ignore_proprioception}
+
+    # pose with respect to episode start
+    robot0_eef_pos_wrt_start:                             # 当前位置相对于起始位置的偏移量（平移部分）
+      shape: [3]
+      horizon: ${task.low_dim_obs_horizon}                # int
+      latency_steps: ${eval:'(${task.camera_obs_latency} - ${task.robot_obs_latency}) * ${task.dataset_frequeny}'} # float
+      down_sample_steps: ${task.obs_down_sample_steps}    # float
+      type: low_dim
+      ignore_by_policy: ${task.ignore_proprioception}
+    robot0_eef_rot_axis_angle_wrt_start:                  # 相对于起点的旋转
+      raw_shape: [3]
+      shape: [6]
+      horizon: ${task.low_dim_obs_horizon}                # int
+      latency_steps: ${eval:'(${task.camera_obs_latency} - ${task.robot_obs_latency}) * ${task.dataset_frequeny}'} # float
+      down_sample_steps: ${task.obs_down_sample_steps}    # float
+      type: low_dim
+      ignore_by_policy: ${task.ignore_proprioception}
+  action: 
+    shape: [10]                                           # 10维动作向量（包含位置/旋转/夹爪控制）
+    horizon: ${task.action_horizon}                       # 预测动作序列长度（16步）
+    latency_steps: 0                                      # float
+    down_sample_steps: ${task.action_down_sample_steps}   # int
+    rotation_rep: rotation_6d
+
+task_name: &task_name umi
+dataset_path: example_demo_session/dataset.zarr.zip
+in_the_wild_dataset_path: example_demo_session/in_the_wild_dataset.zarr.zip
+pose_repr: &pose_repr                                     # 绝对/相对位姿转换
+  obs_pose_repr: relative       # abs or rel              # 观察值使用相对位姿
+  action_pose_repr: relative    # abs or rel or delta     # 动作指令使用相对位姿
+
+env_runner:
+  _target_: diffusion_policy.env_runner.real_pusht_image_runner.RealPushTImageRunner
+
+dataset:
+  _target_: diffusion_policy.dataset.umi_dataset.UmiDataset
+  shape_meta: *shape_meta
+  dataset_path: ${task.dataset_path}
+  cache_dir: null
+  pose_repr: *pose_repr
+  action_padding: False
+  temporally_independent_normalization: False
+  repeat_frame_prob: 0.0
+  max_duration: null
+  seed: 42
+  val_ratio: 0.05
+  use_ratio: 1.0
+  dataset_idx: null # 可指定"1-3,5"格式子集
+
+in_the_wild_dataset:
+  _target_: diffusion_policy.dataset.umi_dataset.UmiDataset
+  shape_meta: *shape_meta
+  dataset_path: ${task.in_the_wild_dataset_path}
+  cache_dir: null
+  pose_repr: *pose_repr
+  action_padding: False
+  temporally_independent_normalization: False
+  repeat_frame_prob: 0.0
+  max_duration: null
+  seed: 42
+  val_ratio: 0.0
+  use_ratio: 1.0

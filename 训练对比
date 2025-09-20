@@ -1,0 +1,8 @@
+
+dp
+21.14.49_diff_c_stack_d1
+CUDA_VISIBLE_DEVICES=1 HYDRA_FULL_ERROR=1 python train_sim.py --config-name=robomimic_dp_ddim task_name=stack_d1 n_demo=200
+
+dp——noise
+21.17.20_diff_c_stack_d1
+CUDA_VISIBLE_DEVICES=0 HYDRA_FULL_ERROR=1 python train_sim.py --config-name=robomimic_dp_ddim_noise task_name=stack_d1 n_demo=200

@@ -1,0 +1,181 @@
+# find . -name "__pycache__" -type d -exec rm -r {} +
+# 忽略 Python 缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+# 忽略训练使用文件夹
+# 训练使用/
+
+bin
+logs
+wandb
+outputs
+data
+data_local
+.vscode
+_wandb
+
+**/.DS_Store
+
+fuse.cfg
+
+*.ai
+
+# Generation results
+results/
+
+ray/auth.json
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# 忽略ckt文件
+*.ckpt
+/思考
+
+# 忽略zarr_read/four/数据目录
+zarr_read/four/
+zarr_read/protas
+
+# 忽略MP4文件
+*.mp4
+
+# 忽略zarr_read/four/数据目录
+protas/video/error_images/
+
+*.model
+*.opt
+kinetics400-rgb-i3d-resnet-50-f32-s2-precise_bn-warmupcosine-bs1024-e196.pth.tar
+
+protas/feature_debug
+
+/MS-TCN2/data
+/MS-TCN2/logs
+/protas_plus/episode_images
+/protas_plus/episode_stages
+/protas_plus/feature_debug
+
+/protas_plus/video
+/episode_frames
+/episode_images
+/episode_stages
+/sam2_point/episode/
+/sam2_point/
