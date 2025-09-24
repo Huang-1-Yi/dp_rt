@@ -242,6 +242,11 @@ class TrainDiffusionUnetHybridWorkspace(BaseWorkspace):
                     policy = self.ema_model
                 policy.eval()
 
+
+
+                # # 在训练循环中，当需要rollout时切换到序列模式
+                # dataset.set_mode(use_sequence_sampler=True)
+
                 print("Running rollout...")
                 # run rollout
                 if (self.epoch % cfg.training.rollout_every) == 0:
@@ -250,6 +255,8 @@ class TrainDiffusionUnetHybridWorkspace(BaseWorkspace):
                     step_log.update(runner_log)
                 print("Rollout done.")
                 
+                # # 切换回compute_loss模式继续训练
+                # dataset.set_mode(use_sequence_sampler=False)
 
                 # run validation
                 if (self.epoch % cfg.training.val_every) == 0:

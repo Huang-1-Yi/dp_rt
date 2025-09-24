@@ -1,8 +1,29 @@
 
 dp
-21.14.49_diff_c_stack_d1
+2025.09.20/21.14.49_diff_c_stack_d1
 CUDA_VISIBLE_DEVICES=1 HYDRA_FULL_ERROR=1 python train_sim.py --config-name=robomimic_dp_ddim task_name=stack_d1 n_demo=200
 
+epoch=0070-test_mean_score=0.9400.ckpt 
+epoch=0090-test_mean_score=0.9600.ckpt 
+epoch=0100-test_mean_score=0.9400.ckpt 
+epoch=0370-test_mean_score=0.9400.ckpt 
+epoch=0570-test_mean_score=0.9600.ckpt 
+latest.ckpt
+
+
 dp——noise
-21.17.20_diff_c_stack_d1
+2025.09.20/21.17.20_diff_c_stack_d1
 CUDA_VISIBLE_DEVICES=0 HYDRA_FULL_ERROR=1 python train_sim.py --config-name=robomimic_dp_ddim_noise task_name=stack_d1 n_demo=200
+
+epoch=0340-test_mean_score=0.9800.ckpt 
+epoch=0370-test_mean_score=0.9600.ckpt 
+epoch=0450-test_mean_score=0.9800.ckpt 
+epoch=0460-test_mean_score=0.9800.ckpt 
+epoch=0520-test_mean_score=0.9800.ckpt 
+latest.ckpt
+
+
+
+dp_noise_heun
+2025.09.21/19.34.46_diff_c_stack_d1
+CUDA_VISIBLE_DEVICES=0 HYDRA_FULL_ERROR=1 python train_sim.py --config-name=robomimic_dp_ddim_noise_heun task_name=stack_d1 n_demo=200
